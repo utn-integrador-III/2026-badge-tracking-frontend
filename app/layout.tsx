@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { PwaRegister } from '@/components/pwa/pwa-register';
 import { AppShell } from '@/components/layout/app-shell';
+import { AuthGuard } from '@/features/auth/components/auth-guard';
 
 export const metadata: Metadata = {
   title: 'Digital Badge',
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#2563eb',
+  themeColor: '#1B3A8C',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1
@@ -26,8 +27,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="es">
       <body>
         <PwaRegister />
-        <AppShell>{children}</AppShell>
+        <AuthGuard>
+          <AppShell>{children}</AppShell>
+        </AuthGuard>
       </body>
     </html>
   );
 }
+
