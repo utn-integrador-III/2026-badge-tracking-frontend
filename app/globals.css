@@ -20,9 +20,21 @@ body {
 
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #dfe8f3;
 }
 
 button,
-a,input,select,textarea {
+a,
+input,
+select,
+textarea {
   outline-offset: 3px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
