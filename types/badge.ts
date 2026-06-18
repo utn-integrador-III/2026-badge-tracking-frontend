@@ -6,6 +6,7 @@ export type DigitalBadge = {
   holder: {
     fullName: string;
     initials: string;
+    photoUrl: string;
     institutionalId: string;
     department: string;
   };
