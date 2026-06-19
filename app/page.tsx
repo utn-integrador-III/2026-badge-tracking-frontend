@@ -30,4 +30,8 @@ export default function HomePage() {
       </section>
     </main>
   );
+import { redirect } from 'next/navigation';
+
+export default function HomePage() {
+  redirect('/activate');
 }
