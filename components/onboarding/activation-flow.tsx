@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Check, ShieldCheck } from 'lucide-react';
 import {
   DEMO_VERIFICATION_CODE,
@@ -13,8 +14,8 @@ type Screen = 'identity' | 'verification' | 'preview' | 'complete';
 
 function Logo() {
   return (
-    <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white font-black text-[#172b70] shadow-sm">
-      <span className="text-lg leading-none">UTN</span>
+    <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white p-1.5 shadow-sm">
+      <Image src="/brand/logo.png" alt="Logo de la UTN" width={48} height={48} className="h-full w-full object-contain" priority />
     </div>
   );
 }
@@ -113,9 +114,12 @@ export function ActivationFlow() {
           <div className="mt-7 w-full rounded-2xl border border-[#c8d2e8] bg-white p-5 text-left">
             <p className="text-xs uppercase tracking-wider text-[#516aa7]">Identificación institucional</p>
             <p className="mt-1 font-mono font-bold text-[#20398b]">{user.studentId}</p>
-            <p className="mt-4 text-xs text-slate-500">El siguiente paso, configurar el PIN de seguridad, pertenece a US-02.</p>
+            <p className="mt-4 text-xs text-slate-500">Continúe para configurar el PIN que protegerá su credencial en este dispositivo.</p>
           </div>
-          <button type="button" onClick={restart} className="mt-auto flex h-14 w-full items-center justify-center rounded-2xl border border-[#20398b] font-bold text-[#20398b]">
+          <button type="button" onClick={() => window.location.assign('/')} className="mt-auto flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-[#20398b] font-bold text-white">
+            Continuar · Crear PIN <ArrowRight className="h-4 w-4" />
+          </button>
+          <button type="button" onClick={restart} className="mt-3 flex h-12 w-full items-center justify-center rounded-2xl border border-[#20398b] font-semibold text-[#20398b]">
             Registrar otra identidad
           </button>
         </section>

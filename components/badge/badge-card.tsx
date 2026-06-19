@@ -17,7 +17,9 @@ export function BadgeCard({ badge }: Readonly<{ badge: DigitalBadge }>) {
           <p className="text-[10px] uppercase tracking-[0.18em] text-white/65">República de Costa Rica</p>
           <p className="mt-1 font-bold">{badge.institution.name}</p>
         </div>
-        <div className="grid h-12 w-12 place-items-center rounded-xl bg-white text-xs font-black text-[#20398b]">UTN</div>
+        <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-xl bg-white p-1.5">
+          <Image src="/brand/logo.png" width={42} height={42} alt="Logo de la UTN" className="h-full w-full object-contain" />
+        </div>
       </div>
 
       <div className="mt-7 flex items-center gap-3">
