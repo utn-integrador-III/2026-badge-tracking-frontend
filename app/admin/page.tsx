@@ -1,27 +1,15 @@
-'use client';
+import { Users, ShieldCheck, Upload } from 'lucide-react';
 
-import { Users, ShieldCheck, Upload, RotateCcw } from 'lucide-react';
-import { useAuthStore } from '@/features/auth/store/auth-store';
+const actions = [
+  { title: 'Emitir badge', description: 'Crear credencial y asociarla a usuario institucional.', icon: ShieldCheck },
+  { title: 'Importar usuarios', description: 'Carga CSV/LDAP para onboarding masivo.', icon: Upload },
+  { title: 'Administrar usuarios', description: 'Buscar, suspender y revisar estado de credenciales.', icon: Users }
+];
 
 export default function AdminPage() {
-  const { resetAuth } = useAuthStore();
-
-  const handleReset = () => {
-    resetAuth();
-    localStorage.removeItem('utn-institutional-identity');
-    window.location.assign('/activate');
-  };
-
-  const actions = [
-    { title: 'Emitir badge', description: 'Crear credencial y asociarla a usuario institucional.', icon: ShieldCheck },
-    { title: 'Importar usuarios', description: 'Carga CSV/LDAP para onboarding masivo.', icon: Upload },
-    { title: 'Administrar usuarios', description: 'Buscar, suspender y revisar estado de credenciales.', icon: Users }
-  ];
-
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-4 p-4 pb-24">
       <h1 className="text-2xl font-bold">Portal administrativo</h1>
-      
       <div className="grid gap-3 md:grid-cols-3">
         {actions.map((action) => {
           const Icon = action.icon;
@@ -34,25 +22,6 @@ export default function AdminPage() {
           );
         })}
       </div>
-
-      <section className="mt-6 border-t border-slate-200 pt-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-2">Herramientas de Desarrollo (Dev Tools)</h2>
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="font-semibold text-slate-900">Restablecer flujo de activación</h3>
-            <p className="text-sm text-slate-600 mt-1">Limpia la identidad vinculada, el PIN y la sesión para probar nuevamente US-01, US-02 y US-03.</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleReset}
-            className="flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 font-semibold rounded-xl border border-red-200 transition-colors shadow-sm self-start sm:self-auto cursor-pointer"
-          >
-            <RotateCcw className="h-4 w-4" />
-            <span>Reiniciar flujo</span>
-          </button>
-        </div>
-      </section>
     </main>
   );
 }
-
