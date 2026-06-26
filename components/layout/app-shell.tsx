@@ -1,7 +1,4 @@
-'use client';
-
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Home, QrCode, ScanLine, UserCog } from 'lucide-react';
 
 const navItems = [
@@ -12,13 +9,10 @@ const navItems = [
 ];
 
 export function AppShell({ children }: Readonly<{ children: React.ReactNode }>) {
-  const pathname = usePathname();
-  const immersive = pathname === '/activate';
-
   return (
     <div className="min-h-dvh">
       {children}
-      {!immersive && <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 backdrop-blur">
+      <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto grid max-w-md grid-cols-4">
           {navItems.map((item) => {
             const Icon = item.icon;
@@ -30,7 +24,7 @@ export function AppShell({ children }: Readonly<{ children: React.ReactNode }>) 
             );
           })}
         </div>
-      </nav>}
+      </nav>
     </div>
   );
 }
