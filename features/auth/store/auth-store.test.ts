@@ -1,8 +1,33 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useAuthStore } from './auth-store';
+
+const localStorageMock = vi.hoisted(() => {
+  const store = new Map<string, string>();
+  const storage = {
+    getItem: vi.fn((key: string) => store.get(key) ?? null),
+    setItem: vi.fn((key: string, value: string) => {
+      store.set(key, value);
+    }),
+    removeItem: vi.fn((key: string) => {
+      store.delete(key);
+    }),
+    clear: vi.fn(() => {
+      store.clear();
+    })
+  };
+
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: storage,
+    configurable: true
+  });
+
+  return storage;
+});
 
 describe('Auth Store (Zustand)', () => {
   beforeEach(() => {
+    localStorageMock.clear();
+    vi.clearAllMocks();
     // Reset state before each test
     useAuthStore.getState().resetAuth();
   });
