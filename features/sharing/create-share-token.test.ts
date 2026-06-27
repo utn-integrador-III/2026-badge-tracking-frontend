@@ -17,6 +17,7 @@ describe('createMockShareToken', () => {
       ttlSeconds: 300
     });
 
+    expect(token.expiresAt).toBe('2026-06-26T12:05:00.000Z');
     expect(token.ttlSeconds).toBe(300);
     expect(JSON.parse(token.payload)).toEqual({
       type: 'digital-badge-share-token',
