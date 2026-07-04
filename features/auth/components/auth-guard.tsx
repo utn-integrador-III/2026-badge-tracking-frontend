@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '../store/auth-store';
 import { PinScreen } from './pin-screen';
 
@@ -10,15 +11,23 @@ interface AuthGuardProps {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [hasInstitutionalIdentity, setHasInstitutionalIdentity] = useState(false);
   const { pin, isAuthenticated } = useAuthStore();
+  const pathname = usePathname();
+  const router = useRouter();
 
-  // Prevent hydration mismatch errors by waiting for the store to hydrate on the client
   useEffect(() => {
     setHasHydrated(true);
-  }, []);
+    setHasInstitutionalIdentity(Boolean(localStorage.getItem('utn-institutional-identity')));
+  }, [pathname]);
+
+  useEffect(() => {
+    if (hasHydrated && pathname !== '/activate' && !hasInstitutionalIdentity) {
+      router.replace('/activate');
+    }
+  }, [hasHydrated, hasInstitutionalIdentity, pathname, router]);
 
   if (!hasHydrated) {
-    // Render an empty layout matching the branding color during initial client load
     return (
       <div className="min-h-dvh bg-[#1B3A8C] flex items-center justify-center">
         <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin" />
@@ -26,16 +35,25 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  // If there's no PIN set up, render the PIN setup screen
+  if (pathname === '/activate') {
+    return <>{children}</>;
+  }
+
+  if (!hasInstitutionalIdentity) {
+    return (
+      <div className="min-h-dvh bg-[#1B3A8C] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-white/20 border-t-white animate-spin" />
+      </div>
+    );
+  }
+
   if (!pin) {
     return <PinScreen mode="setup" />;
   }
 
-  // If a PIN is set up but user is not authenticated, render the PIN auth screen
   if (!isAuthenticated) {
     return <PinScreen mode="auth" />;
   }
 
-  // User is authenticated, render application views
   return <>{children}</>;
 }
