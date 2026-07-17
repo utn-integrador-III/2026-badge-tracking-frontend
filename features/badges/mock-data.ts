@@ -26,3 +26,31 @@ export const mockBadge: DigitalBadge = {
   status: 'active',
   signaturePreview: 'EC-P256:8f4c...19a2'
 };
+
+export const mockBadgeTypes: DigitalBadge[] = [
+  mockBadge,
+  {
+    ...mockBadge,
+    id: 'badge_demo_professor_001',
+    role: 'Professor',
+    holder: {
+      ...mockBadge.holder,
+      fullName: 'Ana María Vargas Solano',
+      initials: 'AV',
+      institutionalId: 'PRO-2026-0142',
+      department: 'Administración de Empresas'
+    }
+  },
+  {
+    ...mockBadge,
+    id: 'badge_demo_staff_001',
+    role: 'Staff',
+    holder: {
+      ...mockBadge.holder,
+      fullName: 'María Jiménez Rojas',
+      initials: 'MJ',
+      institutionalId: 'STA-2026-0088',
+      department: 'Registro Universitario'
+    }
+  }
+];
