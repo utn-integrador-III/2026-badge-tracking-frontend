@@ -10,6 +10,13 @@ export const mockBadge: DigitalBadge = {
     institutionalId: '2024-0001',
     department: 'Ingeniería en Sistemas de Información'
   },
+  extendedIdentity: {
+    campus: 'Sede Central - Pedregal',
+    currentPeriod: 'III Cuatrimestre 2026',
+    email: 'jrodriguez@utn.ac.cr',
+    program: 'Bachillerato en Ingeniería en Sistemas de Información',
+    standing: 'Matrícula activa'
+  },
   institution: {
     name: 'Universidad Técnica Nacional'
   },
