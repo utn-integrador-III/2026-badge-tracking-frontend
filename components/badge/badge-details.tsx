@@ -13,7 +13,8 @@ export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
     ['Emision', badge.issuedAt],
     ['Vigencia', badge.validUntil],
     ['Autoridad emisora', badge.issuer],
-    ['Firma digital', badge.signaturePreview]
+    ['Firma digital', badge.signaturePreview],
+    ['Protección criptográfica', 'ECDSA P-256 / SHA-256']
   ];
 
   return (
