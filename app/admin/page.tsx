@@ -2,6 +2,7 @@
 
 import { Users, ShieldCheck, Upload, RotateCcw } from 'lucide-react';
 import { useAuthStore } from '@/features/auth/store/auth-store';
+import { IssueBadgeForm } from '@/features/admin/issue-badge-form';
 
 export default function AdminPage() {
   const { resetAuth } = useAuthStore();
@@ -34,6 +35,8 @@ export default function AdminPage() {
           );
         })}
       </div>
+
+      <IssueBadgeForm />
 
       <section className="mt-6 border-t border-slate-200 pt-6">
         <h2 className="text-lg font-bold text-slate-900 mb-2">Herramientas de Desarrollo (Dev Tools)</h2>
