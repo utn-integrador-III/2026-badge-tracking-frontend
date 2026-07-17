@@ -1,14 +1,16 @@
 import type { DigitalBadge } from '@/types/badge';
 import { getExtendedIdentityInfo } from '@/features/badges/identity-info';
+import { getBadgeSignatureDisplay } from '@/features/badges/signature-display';
 
 export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
   const extendedRows = getExtendedIdentityInfo(badge);
+  const signature = getBadgeSignatureDisplay(badge);
   const rows = [
     ['Nombre completo', badge.holder.fullName],
     ['Rol', badge.role],
     ['Departamento', badge.holder.department],
     ['ID institucional', badge.holder.institutionalId],
-    ['Emisión', badge.issuedAt],
+    ['Emision', badge.issuedAt],
     ['Vigencia', badge.validUntil],
     ['Autoridad emisora', badge.issuer],
     ['Firma digital', badge.signaturePreview]
@@ -28,7 +30,7 @@ export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
 
       {extendedRows.length > 0 ? (
         <section className="mt-6 rounded-2xl bg-slate-50 p-4">
-          <h2 className="font-bold text-slate-950">Información extendida de identidad</h2>
+          <h2 className="font-bold text-slate-950">Informacion extendida de identidad</h2>
           <dl className="mt-3 divide-y divide-slate-200">
             {extendedRows.map((row) => (
               <div key={row.label} className="grid grid-cols-3 gap-3 py-2 text-sm">
@@ -39,6 +41,21 @@ export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
           </dl>
         </section>
       ) : null}
+
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#20398b]">Firma digital</p>
+        <div className="mt-3 grid gap-2 text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-slate-500">Algoritmo</span>
+            <span className="font-semibold text-slate-950">{signature.algorithm}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-slate-500">Huella</span>
+            <span className="font-mono font-semibold text-slate-950">{signature.fingerprint}</span>
+          </div>
+          <p className="rounded-xl bg-white px-3 py-2 font-medium text-[#20398b]">{signature.statusLabel}</p>
+        </div>
+      </section>
     </section>
   );
 }
