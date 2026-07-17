@@ -1,6 +1,8 @@
 import type { DigitalBadge } from '@/types/badge';
+import { getBadgeSignatureDisplay } from '@/features/badges/signature-display';
 
 export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
+  const signature = getBadgeSignatureDisplay(badge);
   const rows = [
     ['Nombre completo', badge.holder.fullName],
     ['Rol', badge.role],
@@ -23,6 +25,21 @@ export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
           </div>
         ))}
       </dl>
+
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#20398b]">Firma digital</p>
+        <div className="mt-3 grid gap-2 text-sm">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-slate-500">Algoritmo</span>
+            <span className="font-semibold text-slate-950">{signature.algorithm}</span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-slate-500">Huella</span>
+            <span className="font-mono font-semibold text-slate-950">{signature.fingerprint}</span>
+          </div>
+          <p className="rounded-xl bg-white px-3 py-2 font-medium text-[#20398b]">{signature.statusLabel}</p>
+        </div>
+      </section>
     </section>
   );
 }
