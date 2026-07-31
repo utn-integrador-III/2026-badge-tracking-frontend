@@ -1,3 +1,8 @@
+import { TimedQrCode } from '@/components/qr/timed-qr-code';
+
+const QR_VISIBILITY_SECONDS = 60;
+
+export default function SharePage() {
 import Image from 'next/image';
 import { ShareQr } from '@/components/qr/share-qr';
 import { mockBadge } from '@/features/badges/mock-data';
@@ -32,6 +37,7 @@ export default function SharePage() {
         <ShareQr proof={proof} ttlSeconds={QR_LIFETIME_SECONDS} />
         <p className="text-xs leading-5 text-slate-500">El código deja de ser válido automáticamente después de {QR_LIFETIME_SECONDS} segundos.</p>
       </section>
+      <TimedQrCode fields={['ageProof']} visibilitySeconds={QR_VISIBILITY_SECONDS} />
     </main>
   );
 }
