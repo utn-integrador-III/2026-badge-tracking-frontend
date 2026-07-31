@@ -10,6 +10,13 @@ export const mockBadge: DigitalBadge = {
     institutionalId: '2024-0001',
     department: 'Ingeniería en Sistemas de Información'
   },
+  extendedIdentity: {
+    campus: 'Sede Central - Pedregal',
+    currentPeriod: 'III Cuatrimestre 2026',
+    email: 'jrodriguez@utn.ac.cr',
+    program: 'Bachillerato en Ingeniería en Sistemas de Información',
+    standing: 'Matrícula activa'
+  },
   institution: {
     name: 'Universidad Técnica Nacional'
   },
@@ -19,3 +26,31 @@ export const mockBadge: DigitalBadge = {
   status: 'active',
   signaturePreview: 'EC-P256:8f4c...19a2'
 };
+
+export const mockBadgeTypes: DigitalBadge[] = [
+  mockBadge,
+  {
+    ...mockBadge,
+    id: 'badge_demo_professor_001',
+    role: 'Professor',
+    holder: {
+      ...mockBadge.holder,
+      fullName: 'Ana María Vargas Solano',
+      initials: 'AV',
+      institutionalId: 'PRO-2026-0142',
+      department: 'Administración de Empresas'
+    }
+  },
+  {
+    ...mockBadge,
+    id: 'badge_demo_staff_001',
+    role: 'Staff',
+    holder: {
+      ...mockBadge.holder,
+      fullName: 'María Jiménez Rojas',
+      initials: 'MJ',
+      institutionalId: 'STA-2026-0088',
+      department: 'Registro Universitario'
+    }
+  }
+];
