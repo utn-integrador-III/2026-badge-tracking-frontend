@@ -25,7 +25,6 @@ export type ShareToken = {
 };
 
 export function createMockShareToken(input: CreateShareTokenInput): ShareToken {
-export function createMockShareToken(input: CreateShareTokenInput) {
   const expiresAt = new Date(Date.now() + input.ttlSeconds * 1000).toISOString();
 
   return {
