@@ -3,6 +3,10 @@ import { getBadgeSignatureDisplay } from '@/features/badges/signature-display';
 
 export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
   const signature = getBadgeSignatureDisplay(badge);
+import { getExtendedIdentityInfo } from '@/features/badges/identity-info';
+
+export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
+  const extendedRows = getExtendedIdentityInfo(badge);
   const rows = [
     ['Nombre completo', badge.holder.fullName],
     ['Rol', badge.role],
@@ -40,6 +44,19 @@ export function BadgeDetails({ badge }: Readonly<{ badge: DigitalBadge }>) {
           <p className="rounded-xl bg-white px-3 py-2 font-medium text-[#20398b]">{signature.statusLabel}</p>
         </div>
       </section>
+      {extendedRows.length > 0 ? (
+        <section className="mt-6 rounded-2xl bg-slate-50 p-4">
+          <h2 className="font-bold text-slate-950">Información extendida de identidad</h2>
+          <dl className="mt-3 divide-y divide-slate-200">
+            {extendedRows.map((row) => (
+              <div key={row.label} className="grid grid-cols-3 gap-3 py-2 text-sm">
+                <dt className="col-span-1 text-slate-500">{row.label}</dt>
+                <dd className="col-span-2 font-medium text-slate-900">{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
     </section>
   );
 }
