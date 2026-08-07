@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Bell, LogOut, SmartphoneNfc } from 'lucide-react';
 import { BadgeCard } from '@/components/badge/badge-card';
+import { LanguageSelector } from '@/components/i18n/language-selector';
 import { mockBadge } from '@/features/badges/mock-data';
 import { useAuthStore } from '@/features/auth/store/auth-store';
 
@@ -31,6 +32,10 @@ export default function HomePage() {
       <section className="p-5">
         <p className="mb-3 text-sm font-medium text-slate-600">Mi credencial</p>
         <BadgeCard badge={mockBadge} />
+
+        <div className="mt-5">
+          <LanguageSelector />
+        </div>
 
         <div className="mt-5 rounded-2xl border border-[#c8d2e8] bg-[#e8edf7] p-4 text-center text-sm font-medium text-[#20398b]">
           Credencial activa y verificada · Vigencia 2026
