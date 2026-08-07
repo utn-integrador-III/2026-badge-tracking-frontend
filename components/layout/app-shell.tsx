@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, QrCode, ScanLine, UserCog } from 'lucide-react';
+import { Home, Info, QrCode, ScanLine, UserCog } from 'lucide-react';
 
 const navItems = [
   { href: '/', label: 'Inicio', icon: Home },
   { href: '/share', label: 'QR', icon: QrCode },
   { href: '/verify', label: 'Verificar', icon: ScanLine },
-  { href: '/admin', label: 'Admin', icon: UserCog }
+  { href: '/admin', label: 'Admin', icon: UserCog },
+  { href: '/about', label: 'Acerca', icon: Info }
 ];
 
 export function AppShell({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -19,7 +20,7 @@ export function AppShell({ children }: Readonly<{ children: React.ReactNode }>) 
     <div className="min-h-dvh">
       {children}
       {!immersive && <nav className="fixed inset-x-0 bottom-0 border-t border-slate-200 bg-white/95 backdrop-blur">
-        <div className="mx-auto grid max-w-md grid-cols-4">
+        <div className="mx-auto grid max-w-md grid-cols-5">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
