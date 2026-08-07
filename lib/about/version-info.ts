@@ -2,29 +2,35 @@ import packageJson from '../../package.json';
 
 export type VersionInfo = {
   appName: string;
-  buildChannel: 'development' | 'qa' | 'production';
-  release: string;
-  repository: string;
   version: string;
+};
+
+export type TeamMember = {
+  email: string;
+  name: string;
 };
 
 export const versionInfo: VersionInfo = {
   appName: 'Digital Badge',
-  buildChannel: 'development',
-  release: 'Release 1',
-  repository: 'utn-integrador-III/2026-badge-tracking-frontend',
   version: packageJson.version
 };
 
+export const teamMembers: TeamMember[] = [
+  { name: 'Michael Carranza Porras', email: 'micarranzapo@est.utn.ac.cr' },
+  { name: 'Frank Mora Sanchez', email: 'frmorasa@est.utn.ac.cr' },
+  { name: 'Kevin Picado Arias', email: 'kepicadoar@est.utn.ac.cr' },
+  { name: 'Kevin Nuñez Parra', email: 'kenunezpa@est.utn.ac.cr' }
+];
+
 export function formatVersionLabel(info: VersionInfo = versionInfo) {
-  return `${info.appName} v${info.version} · ${info.release}`;
+  return `${info.appName} v${info.version}`;
 }
 
 export function getSupportItems() {
   return [
     'Credencial digital institucional',
-    'Verificación mediante QR',
-    'Protección con PIN y firma criptográfica',
-    'Soporte PWA para uso móvil'
+    'Verificacion mediante QR',
+    'Proteccion con PIN y firma criptografica',
+    'Soporte PWA para uso movil'
   ];
 }

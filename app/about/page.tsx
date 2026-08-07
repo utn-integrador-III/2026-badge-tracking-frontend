@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import { BadgeInfo, Code2, ShieldCheck, Smartphone } from 'lucide-react';
-import { formatVersionLabel, getSupportItems, versionInfo } from '@/lib/about/version-info';
+import { BadgeInfo, Mail, ShieldCheck, Smartphone, Users } from 'lucide-react';
+import { formatVersionLabel, getSupportItems, teamMembers } from '@/lib/about/version-info';
 
 export default function AboutPage() {
   const supportItems = getSupportItems();
@@ -10,7 +10,7 @@ export default function AboutPage() {
       <header className="bg-[#20398b] px-5 pb-8 pt-5 text-center text-white">
         <Image src="/brand/logo.png" alt="Logo de la UTN" width={56} height={56} className="mx-auto rounded-xl bg-white p-1" priority />
         <h1 className="mt-4 text-2xl font-bold">Acerca de Digital Badge</h1>
-        <p className="mt-2 text-sm text-white/75">Información de versión, equipo y capacidades de la aplicación.</p>
+        <p className="mt-2 text-sm text-white/75">Informacion del equipo, version y capacidades de la aplicacion.</p>
       </header>
 
       <section className="space-y-5 p-5">
@@ -20,25 +20,28 @@ export default function AboutPage() {
               <BadgeInfo className="h-6 w-6" aria-hidden />
             </span>
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Versión</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">Version</p>
               <h2 className="font-bold text-slate-950">{formatVersionLabel()}</h2>
             </div>
           </div>
+        </article>
 
-          <dl className="mt-5 divide-y divide-slate-100 text-sm">
-            <div className="grid grid-cols-3 gap-3 py-3">
-              <dt className="text-slate-500">Canal</dt>
-              <dd className="col-span-2 font-semibold capitalize text-slate-950">{versionInfo.buildChannel}</dd>
-            </div>
-            <div className="grid grid-cols-3 gap-3 py-3">
-              <dt className="text-slate-500">Release</dt>
-              <dd className="col-span-2 font-semibold text-slate-950">{versionInfo.release}</dd>
-            </div>
-            <div className="grid grid-cols-3 gap-3 py-3">
-              <dt className="text-slate-500">Repositorio</dt>
-              <dd className="col-span-2 break-words font-semibold text-slate-950">{versionInfo.repository}</dd>
-            </div>
-          </dl>
+        <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-2 font-bold text-slate-950">
+            <Users className="h-5 w-5 text-[#20398b]" aria-hidden />
+            Equipo del proyecto
+          </div>
+          <div className="mt-4 space-y-3">
+            {teamMembers.map((member) => (
+              <div key={member.email} className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-3">
+                <p className="font-bold text-slate-950">{member.name}</p>
+                <p className="mt-1 flex items-center gap-2 break-all text-sm text-slate-600">
+                  <Mail className="h-4 w-4 shrink-0 text-[#20398b]" aria-hidden />
+                  {member.email}
+                </p>
+              </div>
+            ))}
+          </div>
         </article>
 
         <article className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -61,11 +64,11 @@ export default function AboutPage() {
             Badge Tracking Project
           </div>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Aplicación PWA para administrar, verificar y compartir credenciales digitales institucionales de la Universidad Técnica Nacional.
+            Aplicacion PWA para administrar, verificar y compartir credenciales digitales institucionales de la Universidad Tecnica Nacional.
           </p>
           <p className="mt-4 flex items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
-            <Code2 className="h-4 w-4" aria-hidden />
-            Frontend · Next.js · PWA
+            <Smartphone className="h-4 w-4" aria-hidden />
+            Frontend - Next.js - PWA
           </p>
         </article>
       </section>
