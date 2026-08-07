@@ -3,6 +3,7 @@
 import { RotateCcw, ShieldCheck, Upload, Users } from 'lucide-react';
 import { BadgeRevocation } from '@/features/admin/badge-revocation';
 import { IssueBadgeForm } from '@/features/admin/issue-badge-form';
+import { RoleDashboardPanel } from '@/features/admin/role-dashboard-panel';
 import { useAuthStore } from '@/features/auth/store/auth-store';
 
 export default function AdminPage() {
@@ -38,6 +39,7 @@ export default function AdminPage() {
       </div>
 
       <div className="space-y-8">
+        <RoleDashboardPanel />
         <IssueBadgeForm />
         <BadgeRevocation />
 
