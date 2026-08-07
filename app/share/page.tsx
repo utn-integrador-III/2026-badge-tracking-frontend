@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ShareQr } from '@/components/qr/share-qr';
+import { SelectiveShareQr } from '@/components/qr/selective-share-qr';
 import { mockBadge } from '@/features/badges/mock-data';
 
 const QR_LIFETIME_SECONDS = 60;
@@ -29,7 +29,7 @@ export default function SharePage() {
           <p className="mt-1 font-bold text-slate-900">{mockBadge.holder.fullName}</p>
           <p className="text-sm text-slate-600">{mockBadge.holder.institutionalId} - {mockBadge.role}</p>
         </div>
-        <ShareQr proof={proof} ttlSeconds={QR_LIFETIME_SECONDS} />
+        <SelectiveShareQr proof={proof} ttlSeconds={QR_LIFETIME_SECONDS} />
         <p className="text-xs leading-5 text-slate-500">El codigo deja de ser valido automaticamente despues de {QR_LIFETIME_SECONDS} segundos.</p>
       </section>
     </main>
