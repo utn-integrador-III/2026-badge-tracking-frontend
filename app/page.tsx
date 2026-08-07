@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Bell, LogOut, SmartphoneNfc } from 'lucide-react';
 import { BadgeCard } from '@/components/badge/badge-card';
+import { FirstRunTutorial } from '@/components/onboarding/first-run-tutorial';
 import { mockBadge } from '@/features/badges/mock-data';
 import { useAuthStore } from '@/features/auth/store/auth-store';
 
@@ -29,6 +30,7 @@ export default function HomePage() {
       </header>
 
       <section className="p-5">
+        <FirstRunTutorial />
         <p className="mb-3 text-sm font-medium text-slate-600">Mi credencial</p>
         <BadgeCard badge={mockBadge} />
 
