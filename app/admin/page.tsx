@@ -4,6 +4,7 @@ import { RotateCcw, ShieldCheck, Upload, Users } from 'lucide-react';
 import { BadgeRevocation } from '@/features/admin/badge-revocation';
 import { IssueBadgeForm } from '@/features/admin/issue-badge-form';
 import { useAuthStore } from '@/features/auth/store/auth-store';
+import { AuditHistoryPanel } from '@/features/audit/audit-history-panel';
 
 export default function AdminPage() {
   const { resetAuth } = useAuthStore();
@@ -40,6 +41,7 @@ export default function AdminPage() {
       <div className="space-y-8">
         <IssueBadgeForm />
         <BadgeRevocation />
+        <AuditHistoryPanel />
 
         <section className="border-t border-slate-200 pt-6">
           <h2 className="mb-2 text-lg font-bold text-slate-900">Herramientas de Desarrollo (Dev Tools)</h2>
