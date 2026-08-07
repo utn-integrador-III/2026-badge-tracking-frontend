@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { OfflineVerificationStatus } from '@/components/qr/offline-verification-status';
 
 const QrScanner = dynamic(() => import('@/components/qr/qr-scanner').then((mod) => mod.QrScanner), { ssr: false });
 
@@ -14,6 +15,7 @@ export default function VerifyPage() {
         <p className="mt-2 text-sm text-white/75">Escanea el QR para comprobar identidad, vigencia y acceso.</p>
       </header>
       <div className="p-5">
+        <OfflineVerificationStatus />
         <QrScanner />
       </div>
     </main>
