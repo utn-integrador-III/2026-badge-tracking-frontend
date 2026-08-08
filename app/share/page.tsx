@@ -1,22 +1,37 @@
-'use client';
+import Image from 'next/image';
+import { SelectiveShareQr } from '@/components/qr/selective-share-qr';
+import { mockBadge } from '@/features/badges/mock-data';
 
-import { QRCodeSVG } from 'qrcode.react';
-import { Countdown } from '@/components/qr/countdown';
-import { createMockShareToken } from '@/features/sharing/create-share-token';
+const QR_LIFETIME_SECONDS = 60;
 
 export default function SharePage() {
-  const token = createMockShareToken({ fields: ['ageProof'], ttlSeconds: 60 });
+  const proof = {
+    badgeId: mockBadge.id,
+    fullName: mockBadge.holder.fullName,
+    institutionalId: mockBadge.holder.institutionalId,
+    institutionName: mockBadge.institution.name,
+    role: mockBadge.role,
+    status: mockBadge.status,
+    validUntil: mockBadge.validUntil
+  };
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-col items-center gap-6 p-4 pb-24 text-center">
-      <section className="space-y-2 pt-4">
-        <h1 className="text-2xl font-bold">Compartir verificación de edad</h1>
-        <p className="text-slate-600">QR de un solo uso con expiración temporal.</p>
+    <main className="mx-auto min-h-dvh w-full max-w-md bg-[#f4f6fc] pb-28 shadow-2xl">
+      <header className="bg-[#20398b] px-5 pb-8 pt-5 text-center text-white">
+        <Image src="/brand/logo.png" alt="Logo de la UTN" width={52} height={52} className="mx-auto rounded-xl bg-white p-1" priority />
+        <h1 className="mt-4 text-2xl font-bold">Compartir credencial</h1>
+        <p className="mt-2 text-sm text-white/75">Genera una prueba temporal para una verificacion segura.</p>
+      </header>
+
+      <section className="flex flex-col items-center gap-6 p-5 text-center">
+        <div className="w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Titular</p>
+          <p className="mt-1 font-bold text-slate-900">{mockBadge.holder.fullName}</p>
+          <p className="text-sm text-slate-600">{mockBadge.holder.institutionalId} - {mockBadge.role}</p>
+        </div>
+        <SelectiveShareQr proof={proof} ttlSeconds={QR_LIFETIME_SECONDS} />
+        <p className="text-xs leading-5 text-slate-500">El codigo deja de ser valido automaticamente despues de {QR_LIFETIME_SECONDS} segundos.</p>
       </section>
-      <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <QRCodeSVG value={token.payload} size={240} level="M" includeMargin />
-      </div>
-      <Countdown seconds={token.ttlSeconds} />
     </main>
   );
 }

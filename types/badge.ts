@@ -10,6 +10,13 @@ export type DigitalBadge = {
     institutionalId: string;
     department: string;
   };
+  extendedIdentity?: {
+    campus: string;
+    currentPeriod: string;
+    email: string;
+    program: string;
+    standing: string;
+  };
   institution: {
     name: string;
     logoUrl?: string;
