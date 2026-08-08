@@ -2,16 +2,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ShieldCheck } from 'lucide-react';
 import type { DigitalBadge } from '@/types/badge';
-
-const roleLabels: Record<DigitalBadge['role'], string> = {
-  Student: 'Estudiante',
-  Professor: 'Profesor',
-  Staff: 'Personal'
-};
+import { getBadgeTypeConfig } from '@/features/badges/badge-types';
 
 export function BadgeCard({ badge }: Readonly<{ badge: DigitalBadge }>) {
+  const badgeType = getBadgeTypeConfig(badge.role);
+
   return (
-    <article className="rounded-3xl bg-gradient-to-br from-[#2949aa] to-[#142b75] p-5 text-white shadow-xl">
+    <article className={`rounded-3xl bg-gradient-to-br ${badgeType.accentClassName} p-5 text-white shadow-xl`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] uppercase tracking-[0.18em] text-white/65">República de Costa Rica</p>
@@ -32,11 +29,11 @@ export function BadgeCard({ badge }: Readonly<{ badge: DigitalBadge }>) {
           priority
         />
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] uppercase tracking-wider text-white/60">{roleLabels[badge.role]}</p>
+          <p className="text-[10px] uppercase tracking-wider text-white/60">{badgeType.label}</p>
           <h2 className="font-bold leading-5">{badge.holder.fullName}</h2>
         </div>
         <div className="text-right">
-          <p className="text-[10px] uppercase tracking-wider text-white/60">Carné</p>
+          <p className="text-[10px] uppercase tracking-wider text-white/60">{badgeType.shortCode}</p>
           <p className="font-mono text-sm font-bold">{badge.holder.institutionalId}</p>
         </div>
       </div>
