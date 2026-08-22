@@ -3,19 +3,21 @@ import Link from 'next/link';
 import { ShieldCheck } from 'lucide-react';
 import type { DigitalBadge } from '@/types/badge';
 import { getBadgeTypeConfig } from '@/features/badges/badge-types';
+import { getBadgeBranding } from '@/features/branding/institution-branding';
 
 export function BadgeCard({ badge }: Readonly<{ badge: DigitalBadge }>) {
   const badgeType = getBadgeTypeConfig(badge.role);
+  const branding = getBadgeBranding(badge);
 
   return (
-    <article className={`rounded-3xl bg-gradient-to-br ${badgeType.accentClassName} p-5 text-white shadow-xl`}>
+    <article className={`rounded-3xl bg-gradient-to-br ${branding.badgeGradient || badgeType.accentClassName} p-5 text-white shadow-xl`}>
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] uppercase tracking-[0.18em] text-white/65">República de Costa Rica</p>
           <p className="mt-1 font-bold">{badge.institution.name}</p>
         </div>
         <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-xl bg-white p-1.5">
-          <Image src="/brand/logo.png" width={42} height={42} alt="Logo de la UTN" className="h-full w-full object-contain" />
+          <Image src={branding.logoUrl} width={42} height={42} alt={`Logo de ${badge.institution.name}`} className="h-full w-full object-contain" />
         </div>
       </div>
 
