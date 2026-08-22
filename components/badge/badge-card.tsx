@@ -10,7 +10,13 @@ export function BadgeCard({ badge }: Readonly<{ badge: DigitalBadge }>) {
   const branding = getBadgeBranding(badge);
 
   return (
-    <article className={`rounded-3xl bg-gradient-to-br ${branding.badgeGradient || badgeType.accentClassName} p-5 text-white shadow-xl`}>
+    <article
+      className="rounded-3xl p-5 text-white shadow-xl"
+      style={{
+        backgroundImage: `linear-gradient(135deg, ${branding.primaryColor}, ${branding.secondaryColor})`,
+        color: branding.textColor
+      }}
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[10px] uppercase tracking-[0.18em] text-white/65">República de Costa Rica</p>

@@ -5,8 +5,10 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface AuthState {
   pin: string | null;
+  pinConfigured: boolean;
   isAuthenticated: boolean;
   setPin: (newPin: string) => void;
+  markPinConfigured: () => void;
   authenticate: (enteredPin: string) => boolean;
   logout: () => void;
   resetAuth: () => void;
@@ -16,11 +18,14 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       pin: null,
+      pinConfigured: false,
       isAuthenticated: false,
       
       setPin: (newPin: string) => {
-        set({ pin: newPin, isAuthenticated: true });
+        set({ pin: newPin, pinConfigured: true, isAuthenticated: true });
       },
+
+      markPinConfigured: () => set({ pin: null, pinConfigured: true, isAuthenticated: false }),
       
       authenticate: (enteredPin: string) => {
         const { pin } = get();
@@ -36,14 +41,14 @@ export const useAuthStore = create<AuthState>()(
       },
       
       resetAuth: () => {
-        set({ pin: null, isAuthenticated: false });
+        set({ pin: null, pinConfigured: false, isAuthenticated: false });
       }
     }),
     {
       name: 'digital-badge-auth-storage',
       storage: createJSONStorage(() => localStorage),
-      // Only persist the 'pin' field. 'isAuthenticated' should reset to false on reload/fresh start
-      partialize: (state) => ({ pin: state.pin })
+      // Persist only whether the server has a PIN. The PIN itself remains in memory for the active session.
+      partialize: (state) => ({ pinConfigured: state.pinConfigured })
     }
   )
 );

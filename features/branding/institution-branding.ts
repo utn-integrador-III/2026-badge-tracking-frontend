@@ -26,5 +26,13 @@ export function getInstitutionBranding(institutionName: string) {
 }
 
 export function getBadgeBranding(badge: DigitalBadge) {
-  return getInstitutionBranding(badge.institution.name);
+  const fallback = getInstitutionBranding(badge.institution.name);
+
+  return {
+    ...fallback,
+    logoUrl: badge.institution.logoUrl ?? fallback.logoUrl,
+    primaryColor: badge.institution.primaryColor ?? fallback.primaryColor,
+    secondaryColor: badge.institution.secondaryColor ?? fallback.secondaryColor,
+    textColor: badge.institution.textColor ?? fallback.textColor
+  };
 }

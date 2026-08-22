@@ -1,124 +1,77 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { CheckCircle2, Search, ShieldAlert, UserRoundCheck, UserRoundX } from 'lucide-react';
-import { initialBadgeHolders, revokeBadgeHolder, searchBadgeHolders } from '@/features/admin/badge-management';
+import { useState } from 'react';
+import { CheckCircle2, LoaderCircle, Search, ShieldAlert, UserRoundX } from 'lucide-react';
 import { identityApi } from '@/lib/api/identity';
-import { API_BASE_URL } from '@/lib/api/http-client';
+import type { AdminBadgeSearchResult, BadgeLifecycleStatus } from '@/lib/api/types';
+import { useStoredInstitutionalIdentity } from '@/lib/session/institutional-identity';
+import { useAuthStore } from '@/features/auth/store/auth-store';
 
-const roleLabels = { Student: 'Estudiante', Professor: 'Profesor', Staff: 'Personal' } as const;
+const roleLabels = { student: 'Estudiante', professor: 'Profesor', staff: 'Personal', admin: 'Administrador' } as const;
 
 export function BadgeRevocation() {
-  const [holders, setHolders] = useState(initialBadgeHolders);
   const [query, setQuery] = useState('');
-  const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
+  const [holders, setHolders] = useState<AdminBadgeSearchResult[]>([]);
+  const [selected, setSelected] = useState<AdminBadgeSearchResult | null>(null);
+  const [nextStatus, setNextStatus] = useState<BadgeLifecycleStatus>('revoked');
   const [reason, setReason] = useState('');
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
+  const [searching, setSearching] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const pin = useAuthStore((state) => state.pin);
+  const admin = useStoredInstitutionalIdentity();
 
-  const results = useMemo(() => searchBadgeHolders(holders, query), [holders, query]);
-  const selected = holders.find((holder) => holder.badgeId === selectedBadgeId);
-
-  const selectHolder = (badgeId: string) => {
-    setSelectedBadgeId(badgeId);
-    setReason('');
-    setNotice('');
-    setError('');
-  };
-
-  const handleRevoke = async () => {
-    if (!selected || !reason.trim()) return;
-
-    setSubmitting(true);
-    setError('');
+  async function search() {
+    if (!admin || !pin) return setError('La sesión administrativa no contiene identidad y PIN.');
+    if (query.trim().length < 2) return setError('Ingrese al menos dos caracteres para buscar.');
+    setSearching(true); setError(''); setNotice(''); setSelected(null);
     try {
-      if (API_BASE_URL) {
-        await identityApi.revokeBadge(selected.badgeId, { reason: reason.trim() });
-      }
-      setHolders((current) => revokeBadgeHolder(current, selected.badgeId, reason));
-      setNotice(`La credencial de ${selected.fullName} fue revocada y su perfil quedó inactivo.`);
+      const response = await identityApi.searchBadgeHolders({ adminInstitutionalId: admin.institutionalId, adminPin: pin, query: query.trim(), limit: 20 });
+      setHolders(response.results);
+      if (response.results.length === 0) setNotice('No se encontraron titulares.');
+    } catch (caught) {
+      setHolders([]);
+      setError(caught instanceof Error ? caught.message : 'No fue posible buscar titulares.');
+    } finally { setSearching(false); }
+  }
+
+  async function updateStatus() {
+    if (!admin || !pin || !selected?.badge) return;
+    if (reason.trim().length < 3) return setError('El motivo debe contener al menos tres caracteres.');
+    setSubmitting(true); setError(''); setNotice('');
+    try {
+      const response = await identityApi.updateBadgeStatus(selected.badge.id, {
+        adminInstitutionalId: admin.institutionalId,
+        adminPin: pin,
+        status: nextStatus,
+        reason: reason.trim()
+      });
+      setHolders((current) => current.map((holder) => holder.badge?.id === response.badge.id ? { ...holder, isActive: false, badge: response.badge } : holder));
+      setSelected((current) => current ? { ...current, isActive: false, badge: response.badge } : current);
+      setNotice(`La credencial de ${selected.fullName} quedó ${nextStatus === 'revoked' ? 'revocada' : 'suspendida'}.`);
       setReason('');
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'No fue posible revocar la credencial.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+      setError(caught instanceof Error ? caught.message : 'No fue posible actualizar la credencial.');
+    } finally { setSubmitting(false); }
+  }
 
   return (
     <div className="space-y-5">
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <label htmlFor="holder-search" className="text-sm font-bold text-slate-900">Buscar titular</label>
-        <p className="mt-1 text-sm text-slate-500">Use el nombre, correo o identificación institucional.</p>
-        <div className="relative mt-3">
-          <Search className="pointer-events-none absolute left-3 top-3 h-5 w-5 text-slate-400" aria-hidden />
-          <input
-            id="holder-search"
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Ej. 2024-0001"
-            className="w-full rounded-2xl border border-slate-300 py-3 pl-10 pr-4 text-sm"
-          />
+        <div className="mt-3 flex gap-2">
+          <div className="relative flex-1"><Search className="pointer-events-none absolute left-3 top-3 h-5 w-5 text-slate-400" /><input id="holder-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') void search(); }} placeholder="Nombre, correo o ID" className="w-full rounded-2xl border border-slate-300 py-3 pl-10 pr-4 text-sm" /></div>
+          <button type="button" disabled={searching} onClick={() => void search()} className="rounded-2xl bg-[#20398b] px-4 font-semibold text-white">{searching ? <LoaderCircle className="h-5 w-5 animate-spin" /> : 'Buscar'}</button>
         </div>
-
-        <div className="mt-4 space-y-3" aria-live="polite">
-          {results.map((holder) => {
-            const inactive = holder.accountStatus === 'inactive';
-            return (
-              <article key={holder.userId} className={`rounded-2xl border p-4 ${selectedBadgeId === holder.badgeId ? 'border-[#20398b] bg-[#f4f6fc]' : 'border-slate-200'}`}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-bold text-slate-900">{holder.fullName}</p>
-                    <p className="mt-1 text-sm text-slate-600">{holder.institutionalId} · {roleLabels[holder.role]}</p>
-                    <p className="truncate text-xs text-slate-500">{holder.email}</p>
-                  </div>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${inactive ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                    {inactive ? 'Inactivo' : holder.badgeStatus === 'suspended' ? 'Suspendido' : 'Activo'}
-                  </span>
-                </div>
-                <button type="button" onClick={() => selectHolder(holder.badgeId)} className="mt-3 w-full rounded-xl border border-[#20398b] px-3 py-2 text-sm font-semibold text-[#20398b]">
-                  Seleccionar
-                </button>
-              </article>
-            );
-          })}
-          {results.length === 0 ? <p className="rounded-2xl bg-slate-100 p-4 text-center text-sm text-slate-600">No se encontraron titulares.</p> : null}
+        <div className="mt-4 space-y-3">
+          {holders.map((holder) => <article key={holder.userId} className={`rounded-2xl border p-4 ${selected?.userId === holder.userId ? 'border-[#20398b] bg-[#f4f6fc]' : 'border-slate-200'}`}><div className="flex justify-between gap-3"><div><p className="font-bold">{holder.fullName}</p><p className="text-sm text-slate-600">{holder.institutionalId} · {roleLabels[holder.role]}</p><p className="text-xs text-slate-500">{holder.email}</p></div><span className="h-fit rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold">{holder.badge?.status ?? 'Sin badge'}</span></div><button type="button" disabled={!holder.badge} onClick={() => { setSelected(holder); setError(''); setNotice(''); }} className="mt-3 w-full rounded-xl border border-[#20398b] px-3 py-2 text-sm font-semibold text-[#20398b] disabled:opacity-40">Seleccionar</button></article>)}
         </div>
       </section>
 
-      {selected ? (
-        <section className="rounded-3xl border border-red-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-3 text-red-700">
-            <ShieldAlert className="h-7 w-7" aria-hidden />
-            <div><h2 className="font-bold">Revocar credencial</h2><p className="text-sm">Esta acción invalida el badge inmediatamente.</p></div>
-          </div>
-
-          <div className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm">
-            <p className="font-bold text-slate-900">{selected.fullName}</p>
-            <p className="mt-1 text-slate-600">Badge: {selected.badgeId}</p>
-            <p className="text-slate-600">Estado de cuenta: {selected.accountStatus === 'active' ? 'Activo' : 'Inactivo'}</p>
-          </div>
-
-          {selected.badgeStatus !== 'revoked' ? (
-            <>
-              <label htmlFor="revocation-reason" className="mt-4 block text-sm font-bold text-slate-900">Motivo de revocación</label>
-              <textarea id="revocation-reason" value={reason} onChange={(event) => setReason(event.target.value)} rows={3} placeholder="Ej. Graduación o terminación laboral" className="mt-2 w-full resize-none rounded-xl border border-slate-300 p-3 text-sm" />
-              <button type="button" disabled={!reason.trim() || submitting} onClick={handleRevoke} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-3 font-bold text-white disabled:opacity-40">
-                <UserRoundX className="h-5 w-5" aria-hidden /> {submitting ? 'Procesando…' : 'Revocar y marcar inactivo'}
-              </button>
-            </>
-          ) : (
-            <div className="mt-4 flex items-center gap-2 rounded-2xl bg-red-50 p-4 font-semibold text-red-700"><UserRoundX className="h-5 w-5" aria-hidden /> Credencial revocada · Perfil inactivo</div>
-          )}
-
-          {notice ? <p role="status" className="mt-4 flex items-start gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" aria-hidden /> {notice}</p> : null}
-          {error ? <p role="alert" className="mt-4 rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</p> : null}
-        </section>
-      ) : (
-        <div className="flex items-center gap-3 rounded-2xl border border-[#c8d2e8] bg-[#e8edf7] p-4 text-sm text-[#20398b]"><UserRoundCheck className="h-5 w-5" aria-hidden /> Seleccione un titular para administrar su credencial.</div>
-      )}
+      {selected?.badge ? <section className="rounded-3xl border border-red-200 bg-white p-5 shadow-sm"><div className="flex items-center gap-3 text-red-700"><ShieldAlert className="h-7 w-7" /><div><h2 className="font-bold">Cambiar estado de credencial</h2><p className="text-sm">Badge {selected.badge.badgeCode}</p></div></div><label className="mt-4 grid gap-1 text-sm font-bold">Acción<select value={nextStatus} onChange={(event) => setNextStatus(event.target.value as BadgeLifecycleStatus)} className="rounded-xl border border-slate-300 p-3 font-normal"><option value="suspended">Suspender</option><option value="revoked">Revocar permanentemente</option></select></label><label className="mt-4 block text-sm font-bold">Motivo<textarea value={reason} onChange={(event) => setReason(event.target.value)} rows={3} className="mt-2 w-full rounded-xl border border-slate-300 p-3 font-normal" placeholder="Motivo administrativo" /></label><button type="button" disabled={submitting || reason.trim().length < 3} onClick={() => void updateStatus()} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-red-600 px-4 py-3 font-bold text-white disabled:opacity-40">{submitting ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <UserRoundX className="h-5 w-5" />} {submitting ? 'Actualizando…' : nextStatus === 'revoked' ? 'Revocar credencial' : 'Suspender credencial'}</button></section> : null}
+      {notice ? <p role="status" className="flex items-start gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><CheckCircle2 className="h-5 w-5 shrink-0" />{notice}</p> : null}
+      {error ? <p role="alert" className="rounded-2xl bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</p> : null}
     </div>
   );
 }

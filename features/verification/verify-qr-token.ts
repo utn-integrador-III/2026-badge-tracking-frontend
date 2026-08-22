@@ -9,8 +9,8 @@ export type VerifiedBadgeProfile = {
 };
 
 export type QrVerificationResult =
-  | { outcome: 'granted'; message: string; profile: VerifiedBadgeProfile }
-  | { outcome: 'denied'; message: string; profile?: VerifiedBadgeProfile };
+  | { outcome: 'granted'; message: string; profile: VerifiedBadgeProfile; signatureValid?: boolean; verificationId?: string }
+  | { outcome: 'denied'; message: string; profile?: VerifiedBadgeProfile; signatureValid?: boolean; verificationId?: string };
 
 type SharePayload = {
   type: string;

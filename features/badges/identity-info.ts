@@ -14,6 +14,10 @@ export function getExtendedIdentityInfo(badge: DigitalBadge): IdentityInfoRow[] 
     { label: 'Programa', value: profile.program },
     { label: 'Correo institucional', value: profile.email },
     { label: 'Periodo vigente', value: profile.currentPeriod },
-    { label: 'Condición', value: profile.standing }
+    { label: 'Condición', value: profile.standing },
+    { label: 'Nacionalidad', value: profile.nationality ?? '' },
+    { label: 'Lugar de nacimiento', value: profile.birthplace ?? '' },
+    { label: 'Vencimiento del documento', value: profile.documentExpiry ?? '' },
+    { label: 'Firma visual registrada', value: profile.digitalSignatureUrl ?? '' }
   ].filter((row) => row.value.trim().length > 0);
 }

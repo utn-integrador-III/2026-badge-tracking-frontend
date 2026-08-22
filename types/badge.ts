@@ -16,10 +16,17 @@ export type DigitalBadge = {
     email: string;
     program: string;
     standing: string;
+    nationality?: string;
+    birthplace?: string;
+    documentExpiry?: string;
+    digitalSignatureUrl?: string;
   };
   institution: {
     name: string;
     logoUrl?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    textColor?: string;
   };
   issuedAt: string;
   validUntil: string;

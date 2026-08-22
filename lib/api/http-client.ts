@@ -1,5 +1,16 @@
 export const API_BASE_URL = (process.env.NEXT_PUBLIC_URL_BASE ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/$/, '');
 
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly detail?: unknown
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 type JsonBody = Record<string, unknown> | unknown[];
 
 type ApiRequestOptions = Omit<RequestInit, 'body'> & {
@@ -46,7 +57,18 @@ export async function apiRequest<T>(path: string, { accessToken, body, headers, 
   });
 
   if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
+    let detail: unknown;
+    try {
+      detail = await response.json();
+    } catch {
+      detail = await response.text().catch(() => undefined);
+    }
+
+    const message =
+      detail && typeof detail === 'object' && 'detail' in detail
+        ? String((detail as { detail: unknown }).detail)
+        : `API request failed: ${response.status}`;
+    throw new ApiError(message, response.status, detail);
   }
 
   if (response.status === 204) {

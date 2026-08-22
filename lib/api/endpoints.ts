@@ -15,40 +15,32 @@ export function buildQuery(params?: Record<string, QueryValue>) {
 }
 
 export const apiEndpoints = {
-  auth: {
-    login: '/api/v1/auth/login',
-    refresh: '/api/v1/auth/refresh',
-    logout: '/api/v1/auth/logout',
-    changePin: '/api/v1/auth/change-pin'
-  },
   users: {
-    root: '/api/v1/users',
-    byId: (id: string) => `/api/v1/users/${id}`,
-    bulkImport: '/api/v1/users/bulk-import',
-    bulkImportJob: (jobId: string) => `/api/v1/users/bulk-import/${jobId}`,
-    photo: (id: string) => `/api/v1/users/${id}/photo`,
-    badges: (id: string, params?: Record<string, QueryValue>) => `/api/v1/users/${id}/badges${buildQuery(params)}`,
-    history: (id: string, params?: Record<string, QueryValue>) => `/api/v1/users/${id}/history${buildQuery(params)}`
+    register: '/users/institutional-identities',
+    profile: (institutionalId: string) => `/users/${institutionalId}/badge-profile`,
+    profileDetails: (institutionalId: string) => `/users/${institutionalId}/badge-profile/details`,
+    pin: (institutionalId: string) => `/users/${institutionalId}/pin`,
+    validatePin: (institutionalId: string) => `/users/${institutionalId}/pin/validate`,
+    verificationQr: (institutionalId: string) => `/users/${institutionalId}/verification-qr`,
+    ageProofQr: (institutionalId: string) => `/users/${institutionalId}/age-proof-qr`,
+    deliveries: (institutionalId: string) => `/users/${institutionalId}/badge-deliveries/fetch`,
+    notifications: (institutionalId: string) => `/users/${institutionalId}/badge-notifications/fetch`,
+    renewals: (institutionalId: string) => `/users/${institutionalId}/badge-renewals`
   },
   badges: {
-    root: '/api/v1/badges',
-    byId: (id: string) => `/api/v1/badges/${id}`,
-    renew: (id: string) => `/api/v1/badges/${id}/renew`,
-    qr: (id: string, attrs?: string[]) => `/api/v1/badges/${id}/qr${buildQuery({ attrs: attrs?.join(',') })}`,
-    expiringSoon: (params?: Record<string, QueryValue>) => `/api/v1/badges/expiring-soon${buildQuery(params)}`
+    root: '/badges',
+    search: '/badges/search',
+    status: (badgeId: number | string) => `/badges/${badgeId}/status`
   },
   verification: {
-    verify: '/api/v1/verify',
-    qr: '/api/v1/verify/qr',
-    nfc: '/api/v1/verify/nfc',
-    jwks: '/api/v1/verify/.well-known/jwks.json',
-    offlineBundle: '/api/v1/verify/offline-bundle'
+    badge: '/verifications/badge',
+    badgeToken: (token: string) => `/verifications/badge/${token}`,
+    countdown: '/verifications/countdown',
+    countdownToken: (token: string) => `/verifications/countdown/${token}`,
+    ageProof: (token: string) => `/verifications/age-proof/${token}`
   },
-  notifications: {
-    expiry: '/api/v1/notifications/expiry',
-    revocation: '/api/v1/notifications/revocation',
-    welcome: '/api/v1/notifications/welcome',
-    deviceToken: '/api/v1/notifications/device-token',
-    list: (params?: Record<string, QueryValue>) => `/api/v1/notifications${buildQuery(params)}`
+  institutions: {
+    branding: '/institutions/branding',
+    logo: (logoAssetId: string) => `/institutions/branding/logos/${logoAssetId}`
   }
 } as const;

@@ -1,17 +1,25 @@
 'use client';
 
 import Image from 'next/image';
-import { Bell, LogOut, SmartphoneNfc } from 'lucide-react';
+import { Bell, LoaderCircle, LogOut, RefreshCw, SmartphoneNfc } from 'lucide-react';
 import { BadgeCard } from '@/components/badge/badge-card';
 import { InstitutionBrandingPreview } from '@/components/branding/institution-branding-preview';
 import { LanguageSelector } from '@/components/i18n/language-selector';
 import { ExpiryNotificationCard } from '@/components/notifications/expiry-notification-card';
 import { FirstRunTutorial } from '@/components/onboarding/first-run-tutorial';
-import { mockBadge } from '@/features/badges/mock-data';
 import { useAuthStore } from '@/features/auth/store/auth-store';
+import { useBadgeProfile } from '@/features/badges/use-badge-profile';
+
+const statusLabels = {
+  active: 'Credencial activa y verificada',
+  suspended: 'Credencial suspendida',
+  revoked: 'Credencial revocada',
+  expired: 'Credencial vencida'
+} as const;
 
 export default function HomePage() {
   const logout = useAuthStore((state) => state.logout);
+  const { badge, loading, error, reload } = useBadgeProfile();
 
   return (
     <main className="mx-auto min-h-dvh w-full max-w-md bg-[#f4f6fc] pb-28 shadow-2xl">
@@ -35,23 +43,37 @@ export default function HomePage() {
       <section className="p-5">
         <FirstRunTutorial />
         <p className="mb-3 text-sm font-medium text-slate-600">Mi credencial</p>
-        <BadgeCard badge={mockBadge} />
-
-        <div className="mt-5">
-          <ExpiryNotificationCard badge={mockBadge} />
-        </div>
-
-        <div className="mt-5">
-          <InstitutionBrandingPreview />
-        </div>
+        {loading ? (
+          <div className="grid min-h-72 place-items-center rounded-3xl bg-white shadow-sm">
+            <LoaderCircle className="h-8 w-8 animate-spin text-[#20398b]" aria-label="Cargando credencial" />
+          </div>
+        ) : error ? (
+          <div className="rounded-3xl border border-red-200 bg-red-50 p-5 text-sm text-red-800">
+            <p className="font-bold">No fue posible cargar la credencial</p>
+            <p className="mt-1">{error}</p>
+            <button type="button" onClick={() => void reload()} className="mt-4 flex items-center gap-2 rounded-xl bg-red-700 px-4 py-2 font-semibold text-white">
+              <RefreshCw className="h-4 w-4" /> Reintentar
+            </button>
+          </div>
+        ) : badge ? (
+          <>
+            <BadgeCard badge={badge} />
+            <div className="mt-5">
+              <ExpiryNotificationCard badge={badge} />
+            </div>
+            <div className="mt-5">
+              <InstitutionBrandingPreview badge={badge} />
+            </div>
+            <div className={`mt-5 rounded-2xl border p-4 text-center text-sm font-medium ${badge.status === 'active' ? 'border-[#c8d2e8] bg-[#e8edf7] text-[#20398b]' : 'border-amber-200 bg-amber-50 text-amber-800'}`}>
+              {statusLabels[badge.status]} · Vigencia {badge.validUntil.slice(0, 4)}
+            </div>
+          </>
+        ) : null}
 
         <div className="mt-5">
           <LanguageSelector />
         </div>
 
-        <div className="mt-5 rounded-2xl border border-[#c8d2e8] bg-[#e8edf7] p-4 text-center text-sm font-medium text-[#20398b]">
-          Credencial activa y verificada · Vigencia 2026
-        </div>
       </section>
     </main>
   );

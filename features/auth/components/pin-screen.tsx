@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../store/auth-store';
 import { BiometricUnlockButton } from './biometric-unlock-button';
+import { authApi } from '@/lib/api/auth';
+import { ApiError } from '@/lib/api/http-client';
+import { useStoredInstitutionalIdentity } from '@/lib/session/institutional-identity';
 
 interface PinScreenProps {
   mode?: 'setup' | 'auth';
@@ -13,7 +16,8 @@ interface PinScreenProps {
 }
 
 export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps) {
-  const { setPin, authenticate, pin: storedPin, resetAuth } = useAuthStore();
+  const { setPin, pinConfigured, pin: storedPin, resetAuth } = useAuthStore();
+  const identity = useStoredInstitutionalIdentity();
   
   // Internal step for setup: 'enter' (initial pin) or 'confirm' (confirmation pin)
   const [setupStep, setSetupStep] = useState<'enter' | 'confirm'>('enter');
@@ -23,9 +27,10 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
   const [showPin, setShowPin] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [shake, setShake] = useState<boolean>(false);
+  const [submitting, setSubmitting] = useState(false);
   
   // If in auth mode, but there is no PIN, switch to setup mode
-  const currentMode = mode === 'auth' && !storedPin ? 'setup' : mode;
+  const currentMode = mode === 'auth' && !pinConfigured ? 'setup' : mode;
 
   // Clear errors when typing
   useEffect(() => {
@@ -33,13 +38,15 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
   }, [inputPin]);
 
   const handleKeyPress = (num: number) => {
-    if (inputPin.length < 6) {
+    if (!submitting && inputPin.length < 6) {
       setInputPin(prev => prev + num);
     }
   };
 
   const handleBackspace = () => {
-    setInputPin(prev => prev.slice(0, -1));
+    if (!submitting) {
+      setInputPin(prev => prev.slice(0, -1));
+    }
   };
 
   // Watch for 6-digit complete input
@@ -47,7 +54,7 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
     if (inputPin.length === 6) {
       // Small timeout for visual confirmation of the last dot
       const timer = setTimeout(() => {
-        handlePinSubmit(inputPin);
+        void handlePinSubmit(inputPin);
       }, 200);
       return () => clearTimeout(timer);
     }
@@ -63,7 +70,19 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
     }, 400);
   };
 
-  const handlePinSubmit = (val: string) => {
+  const handleMissingPin = () => {
+    resetAuth();
+    setSetupStep('enter');
+    setTempPin('');
+    triggerErrorAnimation('Aún no tienes un PIN configurado. Crea uno para continuar.');
+  };
+
+  const handlePinSubmit = async (val: string) => {
+    if (!identity) {
+      triggerErrorAnimation('No hay una identidad institucional vinculada.');
+      return;
+    }
+
     if (currentMode === 'setup') {
       if (setupStep === 'enter') {
         setTempPin(val);
@@ -72,8 +91,18 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
       } else {
         // Confirm step
         if (val === tempPin) {
-          setPin(val);
-          if (onSuccess) onSuccess();
+          setSubmitting(true);
+          try {
+            await authApi.setPin(identity.institutionalId, val, tempPin);
+            setPin(val);
+            if (onSuccess) onSuccess();
+          } catch (caught) {
+            triggerErrorAnimation(caught instanceof Error ? caught.message : 'No fue posible configurar el PIN.');
+            setSetupStep('enter');
+            setTempPin('');
+          } finally {
+            setSubmitting(false);
+          }
         } else {
           triggerErrorAnimation('Los PIN no coinciden. Inténtalo de nuevo.');
           setSetupStep('enter');
@@ -82,11 +111,23 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
       }
     } else {
       // Auth mode
-      const success = authenticate(val);
-      if (success) {
-        if (onSuccess) onSuccess();
-      } else {
-        triggerErrorAnimation('PIN incorrecto. Inténtalo de nuevo.');
+      setSubmitting(true);
+      try {
+        const validation = await authApi.validatePin(identity.institutionalId, val);
+        if (validation.valid) {
+          setPin(val);
+          if (onSuccess) onSuccess();
+        } else {
+          triggerErrorAnimation('PIN incorrecto. Inténtalo de nuevo.');
+        }
+      } catch (caught) {
+        if (caught instanceof ApiError && caught.status === 409) {
+          handleMissingPin();
+        } else {
+          triggerErrorAnimation(caught instanceof Error ? caught.message : 'No fue posible validar el PIN.');
+        }
+      } finally {
+        setSubmitting(false);
       }
     }
   };
@@ -133,9 +174,26 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
     }
   };
 
-  const handleBiometricUnlock = () => {
-    if (storedPin && authenticate(storedPin)) {
-      if (onSuccess) onSuccess();
+  const handleBiometricUnlock = async () => {
+    if (!identity || !storedPin || submitting) return;
+
+    setSubmitting(true);
+    try {
+      const validation = await authApi.validatePin(identity.institutionalId, storedPin);
+      if (validation.valid) {
+        setPin(storedPin);
+        if (onSuccess) onSuccess();
+      } else {
+        triggerErrorAnimation('PIN incorrecto. Inténtalo de nuevo.');
+      }
+    } catch (caught) {
+      if (caught instanceof ApiError && caught.status === 409) {
+        handleMissingPin();
+      } else {
+        triggerErrorAnimation(caught instanceof Error ? caught.message : 'No fue posible validar el PIN.');
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -227,7 +285,7 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
             </span>
           )}
 
-          {currentMode === 'auth' ? <BiometricUnlockButton onUnlock={handleBiometricUnlock} /> : null}
+          {currentMode === 'auth' && storedPin ? <BiometricUnlockButton onUnlock={() => void handleBiometricUnlock()} /> : null}
         </div>
 
         {/* Custom Numeric Keypad */}
@@ -258,7 +316,7 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
             <button
               type="button"
               onClick={handleBackspace}
-              disabled={inputPin.length === 0}
+              disabled={inputPin.length === 0 || submitting}
               className="flex items-center justify-center h-14 w-full rounded-2xl text-slate-400 hover:text-slate-600 hover:bg-slate-100/30 active:scale-90 disabled:opacity-30 disabled:pointer-events-none transition-all duration-150 cursor-pointer select-none"
             >
               {/* Custom High-Fidelity Backspace Icon path */}

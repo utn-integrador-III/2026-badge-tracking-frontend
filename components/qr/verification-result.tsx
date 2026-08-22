@@ -24,9 +24,14 @@ export function VerificationResult({ result }: Readonly<{ result: QrVerification
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div><dt className="text-xs uppercase tracking-wider text-slate-500">Institución</dt><dd className="mt-1 font-semibold">{result.profile.institutionName}</dd></div>
-            <div><dt className="text-xs uppercase tracking-wider text-slate-500">Vigente hasta</dt><dd className="mt-1 font-semibold">{result.profile.validUntil}</dd></div>
+            {result.profile.validUntil ? <div><dt className="text-xs uppercase tracking-wider text-slate-500">Vigente hasta</dt><dd className="mt-1 font-semibold">{result.profile.validUntil}</dd></div> : null}
           </div>
         </dl>
+      ) : null}
+      {typeof result.signatureValid === 'boolean' ? (
+        <p className="mt-4 border-t border-slate-900/10 pt-3 text-xs font-semibold uppercase tracking-wider">
+          Firma criptográfica: {result.signatureValid ? 'válida' : 'inválida'}
+        </p>
       ) : null}
     </section>
   );

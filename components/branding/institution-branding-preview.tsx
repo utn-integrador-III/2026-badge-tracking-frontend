@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import { Palette } from 'lucide-react';
-import { mockBadge } from '@/features/badges/mock-data';
 import { getBadgeBranding } from '@/features/branding/institution-branding';
+import type { DigitalBadge } from '@/types/badge';
 
-export function InstitutionBrandingPreview() {
-  const branding = getBadgeBranding(mockBadge);
+export function InstitutionBrandingPreview({ badge }: Readonly<{ badge: DigitalBadge }>) {
+  const branding = getBadgeBranding(badge);
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -21,7 +21,7 @@ export function InstitutionBrandingPreview() {
       <div className="mt-4 flex items-center gap-3 rounded-2xl bg-slate-50 p-3">
         <Image src={branding.logoUrl} alt="Logo institucional" width={44} height={44} className="rounded-xl bg-white p-1" />
         <div>
-          <p className="font-semibold text-slate-950">{mockBadge.institution.name}</p>
+          <p className="font-semibold text-slate-950">{badge.institution.name}</p>
           <p className="text-xs text-slate-500">
             {branding.primaryColor} / {branding.secondaryColor}
           </p>

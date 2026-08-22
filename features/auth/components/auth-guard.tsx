@@ -12,7 +12,7 @@ interface AuthGuardProps {
 export function AuthGuard({ children }: AuthGuardProps) {
   const [hasHydrated, setHasHydrated] = useState(false);
   const [hasInstitutionalIdentity, setHasInstitutionalIdentity] = useState(false);
-  const { pin, isAuthenticated } = useAuthStore();
+  const { pinConfigured, isAuthenticated } = useAuthStore();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -47,7 +47,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  if (!pin) {
+  if (!pinConfigured) {
     return <PinScreen mode="setup" />;
   }
 

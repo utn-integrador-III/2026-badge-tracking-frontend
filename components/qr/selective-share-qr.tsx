@@ -3,22 +3,32 @@
 import { useMemo, useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { ShareQr } from '@/components/qr/share-qr';
-import type { BadgeShareProof } from '@/features/sharing/create-share-token';
-import { createSelectiveProof, getIncludedFieldLabels, type ShareableField, shareableFieldOptions } from '@/features/sharing/selective-disclosure';
+import type { DisclosableAttribute } from '@/lib/api/types';
 
 type SelectiveShareQrProps = Readonly<{
-  proof: BadgeShareProof;
+  institutionalId: string;
+  pin: string;
   ttlSeconds: number;
 }>;
 
-const defaultFields: ShareableField[] = ['fullName', 'institutionalId', 'institutionName', 'role', 'status', 'validUntil'];
+const shareableFieldOptions: ReadonlyArray<{ key: DisclosableAttribute; label: string; required?: boolean }> = [
+  { key: 'badgeCode', label: 'ID de credencial', required: true },
+  { key: 'fullName', label: 'Nombre completo' },
+  { key: 'photoUrl', label: 'Fotografía' },
+  { key: 'institutionalId', label: 'Identificación institucional' },
+  { key: 'role', label: 'Rol' }
+];
 
-export function SelectiveShareQr({ proof, ttlSeconds }: SelectiveShareQrProps) {
-  const [selectedFields, setSelectedFields] = useState<ShareableField[]>(defaultFields);
-  const selectiveProof = useMemo(() => createSelectiveProof(proof, selectedFields) as BadgeShareProof, [proof, selectedFields]);
-  const includedLabels = useMemo(() => getIncludedFieldLabels(selectedFields), [selectedFields]);
+const defaultFields: DisclosableAttribute[] = ['badgeCode', 'fullName', 'photoUrl', 'institutionalId', 'role'];
 
-  const toggleField = (field: ShareableField) => {
+export function SelectiveShareQr({ institutionalId, pin, ttlSeconds }: SelectiveShareQrProps) {
+  const [selectedFields, setSelectedFields] = useState<DisclosableAttribute[]>(defaultFields);
+  const includedLabels = useMemo(
+    () => shareableFieldOptions.filter((field) => selectedFields.includes(field.key)).map((field) => field.label),
+    [selectedFields]
+  );
+
+  const toggleField = (field: DisclosableAttribute) => {
     setSelectedFields((current) => (current.includes(field) ? current.filter((item) => item !== field) : [...current, field]));
   };
 
@@ -47,7 +57,14 @@ export function SelectiveShareQr({ proof, ttlSeconds }: SelectiveShareQrProps) {
         </div>
       </section>
 
-      <ShareQr proof={selectiveProof} ttlSeconds={ttlSeconds} includedFields={includedLabels} />
+      <ShareQr
+        key={selectedFields.join('|')}
+        disclosedAttributes={selectedFields}
+        includedFields={includedLabels}
+        institutionalId={institutionalId}
+        pin={pin}
+        ttlSeconds={ttlSeconds}
+      />
     </div>
   );
 }
