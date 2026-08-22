@@ -1,6 +1,6 @@
-# Digital Badge PWA — Next.js Template
+# Digital Badge PWA
 
-Plantilla inicial para una aplicación PWA mobile-first de credenciales digitales institucionales.
+Aplicación PWA mobile-first para credenciales digitales institucionales.
 
 ## Stack incluido
 
@@ -35,6 +35,13 @@ Copia `.env.example` a `.env.local` y ajusta:
 cp .env.example .env.local
 ```
 
+El navegador consume `/api/backend` en el mismo origen. El servidor de Next.js reenvía esas solicitudes al backend definido en `BACKEND_API_BASE_URL`, evitando exponer esa dirección al cliente y sin requerir CORS entre ambos servicios.
+
+```env
+NEXT_PUBLIC_URL_BASE=/api/backend
+BACKEND_API_BASE_URL=https://api.example.edu
+```
+
 ## Estructura
 
 ```txt
@@ -48,9 +55,8 @@ tests/                  Unit/e2e
 docs/                   Documentación técnica del frontend
 ```
 
-## Pendientes de implementación
+## Consideraciones pendientes
 
-- Reemplazar mocks por endpoints reales del backend.
 - Implementar validación criptográfica con Web Crypto/JWS/COSE.
 - Definir estrategia final para cache de llaves públicas y revocation lists.
 - Añadir control de PIN y biometría según compatibilidad web/PWA.
