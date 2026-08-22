@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:ui": "vitest --ui",
+    "coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "format": "prettier --write .",
     "analyze": "ANALYZE=true next build"
@@ -40,6 +41,7 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@vitest/coverage-v8": "latest",
     "autoprefixer": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
