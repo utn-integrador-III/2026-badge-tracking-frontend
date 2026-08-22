@@ -5,6 +5,7 @@ import { Bell, LogOut, SmartphoneNfc } from 'lucide-react';
 import { BadgeCard } from '@/components/badge/badge-card';
 import { InstitutionBrandingPreview } from '@/components/branding/institution-branding-preview';
 import { LanguageSelector } from '@/components/i18n/language-selector';
+import { ExpiryNotificationCard } from '@/components/notifications/expiry-notification-card';
 import { FirstRunTutorial } from '@/components/onboarding/first-run-tutorial';
 import { mockBadge } from '@/features/badges/mock-data';
 import { useAuthStore } from '@/features/auth/store/auth-store';
@@ -38,6 +39,7 @@ export default function HomePage() {
 
         <div className="mt-5">
           <InstitutionBrandingPreview />
+          <ExpiryNotificationCard badge={mockBadge} />
         </div>
 
         <div className="mt-5">
