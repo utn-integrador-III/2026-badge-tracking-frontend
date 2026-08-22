@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../store/auth-store';
+import { BiometricUnlockButton } from './biometric-unlock-button';
 
 interface PinScreenProps {
   mode?: 'setup' | 'auth';
@@ -132,6 +133,12 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
     }
   };
 
+  const handleBiometricUnlock = () => {
+    if (storedPin && authenticate(storedPin)) {
+      if (onSuccess) onSuccess();
+    }
+  };
+
   return (
     <div className="flex min-h-dvh flex-col bg-slate-50 text-slate-800 max-w-md mx-auto shadow-2xl relative overflow-hidden select-none">
       {/* Top Banner (Dark Blue Section) */}
@@ -219,6 +226,8 @@ export function PinScreen({ mode = 'auth', onSuccess, onCancel }: PinScreenProps
               {error}
             </span>
           )}
+
+          {currentMode === 'auth' ? <BiometricUnlockButton onUnlock={handleBiometricUnlock} /> : null}
         </div>
 
         {/* Custom Numeric Keypad */}
