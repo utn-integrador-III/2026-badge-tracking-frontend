@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { Bell, LogOut, SmartphoneNfc } from 'lucide-react';
 import { BadgeCard } from '@/components/badge/badge-card';
+import { InstitutionBrandingPreview } from '@/components/branding/institution-branding-preview';
 import { LanguageSelector } from '@/components/i18n/language-selector';
 import { ExpiryNotificationCard } from '@/components/notifications/expiry-notification-card';
 import { FirstRunTutorial } from '@/components/onboarding/first-run-tutorial';
@@ -37,6 +38,7 @@ export default function HomePage() {
         <BadgeCard badge={mockBadge} />
 
         <div className="mt-5">
+          <InstitutionBrandingPreview />
           <ExpiryNotificationCard badge={mockBadge} />
         </div>
 
